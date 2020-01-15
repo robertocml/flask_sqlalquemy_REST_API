@@ -9,7 +9,7 @@ basedir = os.path.abspath(os.path.dirname(__file__))
 
 #Database
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///' + os.path.join(basedir,'db.sqlite')
-app.config['SQLAlchemy_TRACK_MODIFICATIONS'] = False
+app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
 #Init db
 db = SQLAlchemy(app)
@@ -40,13 +40,24 @@ product_schema = ProductSchema()
 products_schema = ProductSchema(many=True)
 
 
-
-
-
 @app.route('/', methods=['GET'])
 def get():
     return jsonify({'msg': 'Hello World'})
 
+
+# Create a Product
+@app.route('/product', methods=['POST'])
+def add_product():
+    name = request.json['name']
+    description = request.json['description']
+    price = request.json['price']
+    qty = request.json['qty']
+
+    new_product = Product(name,description, price, qty)
+    db.session.add(new_product)
+    db.session.commit()
+
+    return product_schema.jsonify(new_product)
 
 
 # Run Server
